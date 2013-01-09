@@ -26,18 +26,10 @@ class Recipe
 
   def include?(*items)
     !!items.find {|item|includes_ingredient? item}
-    # items.find do |item|
-    #   return true if includes_ingredient? item
-    # end
-    # return false
   end
 
   def includes_ingredient?(item)
     !!ingredients.find {|ingredient|ingredient.include? item}
-    # @ingredients.find do |ingredient|
-    #   return true if ingredient.include? item
-    # end
-    # return false
   end
 
   def ingredients
@@ -45,57 +37,9 @@ class Recipe
   end
 end
 
-cookies = Recipe.new 'Chocolate Chip Cookies', ['1 cup white sugar', 'semi-sweet chocolate chips', 'love'] , ['U HAZ DEM, DONE!'], '1 dozen'
-puts cookies.include? 'white sugar'
-puts cookies.include? 'peanuts'
-puts cookies.include? 'peanuts', 'white sugar'
-
-
 describe Recipe do
   let(:name) { 'Chocolate Chip Cookies' }
-  let(:ingredients) { ['Chocolate', 'Chips', 'Cookies'] }
-  let(:instructions) { ['U HAZ DEM, DONE!'] }
-  
-  subject { Recipe.new name, ingredients, instructions }
-
-  its(:name) { should == name }
-  its(:ingredients) { should == ingredients }
-  its(:instructions) { should == instructions }
-
-end
-
-describe Recipe do
-  let(:name) { 'Chocolate Chip Cookies' }
-  let(:ingredients) { ['Chocolate', 'Chips', 'Cookies'] }
-  let(:instructions) { ['U HAZ DEM, DONE!'] }
-  let(:servings) { '1 Dozen' }
-
-  subject { Recipe.new ( { :name => name, :ingredients => ingredients, :instructions => instructions, :servings => servings } ) }
-
-  its(:servings) { should == servings }
-
-end
-
-describe Recipe do
-  let(:name) { 'Chocolate Chip Cookies' }
-  let(:ingredients) { ['Chocolate', 'Chips', 'Cookies'] }
-  let(:instructions) { ['U HAZ DEM, DONE!'] }
-  let(:servings) { '1 Dozen' }
-  
-  subject { Recipe.new name: name, ingredients: ingredients, instructions: instructions, servings: servings }
-
-  its(:name) { should == name }
-  its(:ingredients) { should == ingredients }
-  its(:instructions) { should == instructions }
-  its(:servings) { should == servings }
-
-end
-
-
-
-describe Recipe do
-  let(:name) { 'Chocolate Chip Cookies' }
-  let(:ingredients) { ['Chocolate', 'Chips', 'Cookies'] }
+  let(:ingredients) { ['Chocolate', 'Chips', 'Cookies', '1 cup white sugar', 'love'] }
   let(:instructions) { ['U HAZ DEM, DONE!'] }
   let(:servings) { '1 Dozen' }
 
@@ -107,7 +51,38 @@ describe Recipe do
       recipe.name.should == name
     end
   end
-  context "Recipe with three arguments" do
+  context "Recipe with four arguments" do
+    let(:recipe) { Recipe.new name, ingredients, instructions, servings }
+
+    it "should know its servings" do
+      recipe.servings.should == servings
+    end
+  end
+  context "Recipe with named arguments" do
+    let(:recipe) { Recipe.new name: name, ingredients: ingredients, instructions: instructions, servings: servings }
+
+    it "should know its servings" do
+      recipe.name.should == name
+      recipe.ingredients.should == ingredients
+      recipe.instructions.should == instructions
+      recipe.servings.should == servings
+    end
+  end
+
+  context "Recipe with special ingredient" do
+
+    let(:recipe) { Recipe.new name: name, ingredients: ingredients, instructions: instructions, servings: servings }
+    
+    it "Should now when there is an ingredient" do
+      recipe.include?('white sugar').should == true
+    end
+    it "Should now when there isn't an ingredient" do
+      recipe.include?('peanuts').should == false
+    end
+    it "Should be able to check for one of many ingredients" do
+      recipe.include?('peanuts', 'white sugar').should == true
+    end
+
   end
 end
 
