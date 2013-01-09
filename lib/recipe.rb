@@ -25,7 +25,7 @@ class Recipe
   end
 
   def include?(*items)
-    !!items.find {|item|includes_ingredient? item}
+    !!items.any? {|item|includes_ingredient? item}
   end
 
   def includes_ingredient?(item)
@@ -34,6 +34,39 @@ class Recipe
 
   def ingredients
     @ingredients ||= []
+  end
+end
+
+class RecipeDefinition
+  # def initialize(name)
+  #   @name = name
+  #   yield self if block_given?
+  # end
+  def initialize(name,&block)
+    @name = name
+    instance_eval(&block)
+  end
+
+  def ingredients
+    @ingredients ||= []
+  end
+  def ingredient (name)
+    ingredients.push name
+  end
+  def instructions
+    @instructions ||= []
+  end
+  def instruction (step)
+    instructions.push step
+  end
+  def serves (serves)
+    @serves = serves
+  end
+  def servings
+    @serves ||= ""
+  end
+  def recipe
+    Recipe.new @name, ingredients, instructions, servings
   end
 end
 
@@ -85,4 +118,50 @@ describe Recipe do
 
   end
 end
+
+describe RecipeDefinition do
+  let(:name) { 'Chocolate Chip Cookies' }
+
+  context "RecipeDefinition constructor" do
+    it "should accept a block" do
+      definition = RecipeDefinition.new name do
+        ingredient "Foo"
+        ingredient "Bar"
+        ingredient "Baz"
+
+        instruction "Preheat oven to 350 degrees"
+        instruction "Chow down!"
+
+        serves "1 Dozen"
+      end
+      recipe = definition.recipe
+      recipe.name.should == name
+      recipe.ingredients.length.should == 3
+      recipe.instructions.length.should == 2
+      recipe.servings.should == "1 Dozen"
+    end
+  end
+
+  # context "RecipeDefinition can handle monkey patched quantities" do
+  #   it "should accept a block" do
+  #     definition = RecipeDefinition.new name do
+  #       ingredient "butter", 1.cup, "softened"
+  #       ingredient "milk", 3.cups
+  #       instruction "Preheat oven to 350 degrees F (175 degrees C)."
+  #       serves 4.dozen, "cookies"
+  #     end
+
+  #     recipe = definition.recipe
+  #     recipe.name.should == name
+  #     recipe.ingredients[0].shoud == "1 cup softened butter"
+  #     recipe.ingredients[0].shoud == "3 cups milk"
+  #     recipe.instructions[0].should == "Preheat oven to 350 degrees F (175 degrees C)."
+  #     recipe.servings.should == "4 dozen cookies"
+  #   end
+  # end
+
+
+end
+
+
 
