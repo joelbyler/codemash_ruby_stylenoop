@@ -59,14 +59,15 @@ class RecipeDefinition
   def instruction (step)
     instructions.push step
   end
-  def serves (serves)
-    @serves = serves
-  end
-  def servings
-    @serves ||= ""
+  def serves (serves=nil)
+    if serves
+      @serves = serves
+    else
+      @serves ||= ""
+    end
   end
   def recipe
-    Recipe.new @name, ingredients, instructions, servings
+    Recipe.new @name, ingredients, instructions, serves
   end
 end
 
